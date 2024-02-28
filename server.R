@@ -10,11 +10,11 @@ library(urbnthemes)
 # set_urbn_defaults(style = "map")
 
 # Leaflet bindings are a bit slow; for now we'll just sample to compensate
-set.seed(100)
-districtdata <- districts[sample.int(nrow(districts), 10000),]
+# set.seed(100)
+# districtdata <- districts[sample.int(nrow(districts), 10000),]
 # By ordering by population, we ensure that the (comparatively rare) SuperZIPs
 # will be drawn last and thus be easier to see
-districtdata <- districtdata[order(districts$population),]
+districtdata <- districts[order(districts$population),]
 
 function(input, output, session) {
   
@@ -97,24 +97,51 @@ function(input, output, session) {
   ## County Map ##############################################
   
   pal <- colorQuantile("YlOrRd", NULL, n = 9)
-  
-  popup_dat <- paste0("<strong>County: </strong>", 
-                      merged_data$NAMELSAD, 
-                      "<br><strong>Population: </strong>", 
+
+  popup_dat <- paste0("<strong>County: </strong>",
+                      merged_data$NAMELSAD,
+                      "<br><strong>Population: </strong>",
                       merged_data$TotalPopulation)
-  
+
   output$countyMap <- renderLeaflet({
     leaflet(data = merged_data) %>%
       addTiles() %>%
       setView(lng = -93.85, lat = 37.45, zoom = 4) %>%
-      addPolygons(fillColor = ~pal(TotalPopulation), 
-                  fillOpacity = 0.8, 
-                  color = "#BDBDC3", 
+      addPolygons(fillColor = ~pal(TotalPopulation),
+                  fillOpacity = 0.8,
+                  color = "#BDBDC3",
                   weight = 1,
                   popup = popup_dat)%>%
       addLegend("bottomleft", pal=pal, values=merged_data$TotalPopulation, title="population",
                 layerId="colorLegend")
   })
+  
+  # using leafletproxy for county map - not working?
+  
+  # output$countyMap <- renderLeaflet({
+  #   leaflet() %>%
+  #     addTiles() %>%
+  #     setView(lng = -93.85, lat = 37.45, zoom = 4)
+  # })
+  # 
+  # observe({
+  #   pal <- colorQuantile("YlOrRd", NULL, n = 9)
+  # 
+  #   popup_dat <- paste0("<strong>County: </strong>",
+  #                       merged_data$NAMELSAD,
+  #                       "<br><strong>Population: </strong>",
+  #                       merged_data$TotalPopulation)
+  #   
+  #   leafletProxy("countyMap", data = merged_data) %>%
+  #     clearShapes() %>%
+  #     addPolygons(fillColor = ~pal(TotalPopulation), 
+  #                 fillOpacity = 0.8, 
+  #                 color = "#BDBDC3", 
+  #                 weight = 1,
+  #                 popup = popup_dat)%>%
+  #     addLegend("bottomleft", pal=pal, values=merged_data$TotalPopulation, title="population",
+  #               layerId="colorLegend")
+  # })
   
   ## Data Explorer ###########################################
   
