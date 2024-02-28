@@ -83,7 +83,8 @@ library(scales)
 
 ### Begin data prep
 # Download county shape file from Tiger.
-us.map <- st_read(dsn = "./Desktop/MDI/NHSAdash/tl_2023_us_county", layer = "tl_2023_us_county")
+# us.map <- st_read(dsn = "./Desktop/MDI/NHSAdash/tl_2023_us_county", layer = "tl_2023_us_county")
+us.map <- st_read(dsn = "tl_2023_us_county", layer = "tl_2023_us_county")
 
 # Remove Alaska(2), Hawaii(15), Puerto Rico (72), Guam (66), Virgin Islands (78), American Samoa (60)
 #  Mariana Islands (69), Micronesia (64), Marshall Islands (68), Palau (70), Minor Islands (74)

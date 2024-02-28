@@ -47,9 +47,11 @@ navbarPage("NHSA Dashboard", id="nav",
            ),
            
            tabPanel("County map",
-                    div(
-                        # plotOutput("countyPlot")
-                        leafletOutput("test", width="100%", height="100%")
+                    div(class="outer",
+                        tags$head(
+                          includeCSS("styles.css"),
+                        ),
+                        leafletOutput("countyMap", width="100%", height="100%")
                     )
            ),
            
