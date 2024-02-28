@@ -96,61 +96,24 @@ function(input, output, session) {
   
   ## County Map ##############################################
   
-  output$countyPlot<-renderPlot({
-    # merged_data %>%
-    #   ggplot(aes()) +
-    #   geom_sf(fill = "grey", color = "#ffffff") +
-    #   coord_sf(default_crs = sf::st_crs(4326))
-    
-    breaks <- c(0, 13853, 45472, 97454, 207541, 7888212)
-    labels <- c("0-13853", "13854-45472", "45473-97454", "97455-207541", "207541-7888212")
-    
-    merged_data$Income_Category <- cut(merged_data$TotalIncome, breaks = breaks, labels = labels, include.lowest = TRUE)
-    
-    ggplot(merged_data) +
-      geom_sf(mapping = aes(fill = Income_Category), color = NA, size = 0.05) +
-      scale_fill_manual(values = c("0-13853" = "#7f7f7f", "13854-45472" = "#6cabec", "45473-97454" = "#4c7bab", "97455-207541" = "#375980", "207541-7888212" = "#1a2c43")) +
-      labs(fill = "Total Household Income") +
-      theme_urbn_map() +
-      theme(legend.position = "right") +
-      theme(plot.margin = margin(0, 0, 0, 0, "cm")) +
-      coord_sf(expand = FALSE)   
-    
-    ## default color scale
-    # merged_data %>%
-    #   ggplot() +
-    #   geom_sf(mapping = aes(fill = TotalIncome),
-    #           color = NA, size = 0.05) +
-    #   labs(fill = "Total Household Income") +
-    #   theme_urbn_map()
-  })
+  pal <- colorQuantile("YlOrRd", NULL, n = 9)
   
-  ##### TEST. THIS DOES NOT WORK CURRENTLY #####
+  popup_dat <- paste0("<strong>County: </strong>", 
+                      merged_data$NAMELSAD, 
+                      "<br><strong>Population: </strong>", 
+                      merged_data$TotalPopulation)
   
-  output$test <- renderLeaflet({
-    leaflet() %>%
+  output$countyMap <- renderLeaflet({
+    leaflet(data = merged_data) %>%
       addTiles() %>%
-      setView(lng = -93.85, lat = 37.45, zoom = 4)
-  })
-  
-  observe({
-    # pal <- colorBin("viridis", colorData, 7, pretty = FALSE)
-    pal <- colorQuantile("YlOrRd", NULL, n = 9)
-    
-    popup_dat <- paste0("<strong>County: </strong>", 
-                        merged_data$NAMELSAD, 
-                        "<br><strong>Value: </strong>", 
-                        merged_data$TotalPopulation)
-    
-    leafletProxy("test", data = merged_data) %>%
-      clearShapes() %>%
+      setView(lng = -93.85, lat = 37.45, zoom = 4) %>%
       addPolygons(fillColor = ~pal(TotalPopulation), 
                   fillOpacity = 0.8, 
                   color = "#BDBDC3", 
                   weight = 1,
-                  popup = popup_dat) # %>%
-      # addLegend("bottomleft", pal=pal, values=colorData, title=colorBy,
-      #           layerId="colorLegend")
+                  popup = popup_dat)%>%
+      addLegend("bottomleft", pal=pal, values=merged_data$TotalPopulation, title="population",
+                layerId="colorLegend")
   })
   
   ## Data Explorer ###########################################
