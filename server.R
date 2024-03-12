@@ -9,10 +9,10 @@ library(urbnthemes)
 
 # set_urbn_defaults(style = "map")
 
-# Leaflet bindings are a bit slow; for now we'll just sample to compensate
+# Leaflet bindings are a bit slow; sampling first 10000
 # set.seed(100)
 # districtdata <- districts[sample.int(nrow(districts), 10000),]
-# By ordering by population, we ensure that the (comparatively rare) SuperZIPs
+# By ordering by population, we ensure that the (comparatively rare) HS centers
 # will be drawn last and thus be easier to see
 districtdata <- districts[order(districts$population),]
 

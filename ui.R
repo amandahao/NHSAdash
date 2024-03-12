@@ -3,6 +3,7 @@ library(leaflet)
 
 # Choices for drop-downs
 vars <- c(
+  # default choice, add col to df
   "Population" = "population",
   "Median income" = "median_household_income"
 )
