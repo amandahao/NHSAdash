@@ -4,6 +4,8 @@ library(greenR)
 library(dplyr)
 library(leaflet)
 
+setwd("./Desktop/MDI/NHSAdash/")
+
 source("get_green_data.R")
 source("modified_visualizer.R")
 
@@ -11,18 +13,18 @@ source("modified_visualizer.R")
 
 virginia_green_data <- get_green_data("Washington, D.C., United States")$osm_polygons
 
-locations <- c("Arlington County, Virginia, United States",
-               "Fairfax County, Virginia, United States",
-               "Loudoun County, Virginia, United States")
+locations <- read.csv("va_counties.csv", header=F)$V1
 
 for (location in locations) {
   green_data <- get_green_data(location)
   virginia_green_data <- bind_rows(virginia_green_data, green_data$osm_polygons)
 }
 
+# write.csv(virginia_green_data, file = "va_green_data_2.csv")
+# va_green_data_1 <- read.csv("va_green_data_1.csv", header = TRUE)
+
 modified_visualizer(virginia_green_data)
 
-# test <- get_green_data("")$osm_polygons
 
 ## extra greenR functions
 

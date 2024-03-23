@@ -1,7 +1,7 @@
 #' get OSM Data (greenspace only) - repurposed from greenR package
 #'
 #' This function downloads OpenStreetMap (OSM) data for a specified location or bounding box.
-#' The OSM data includes information about highways, green areas, and trees in the specified location.
+#' The OSM data includes information about green areas in the specified location.
 #' It requires an internet connection. If using RStudio Cloud, or if you need to use a private
 #' Nominatim server, you can specify an alternative server URL and credentials (username and password).
 #'
@@ -56,7 +56,7 @@ get_green_data <- function(bbox, server_url = "https://nominatim.openstreetmap.o
     query = list(
       q = bbox,
       format = "json",
-      featuretype = "settlement"
+      featuretype = "settlement" # county or city? can we change this
     ),
     auth
   )
@@ -95,8 +95,13 @@ get_green_data <- function(bbox, server_url = "https://nominatim.openstreetmap.o
   green_areas_data <- list()
   
   # Align and combine 'sf' objects
-  aligned_polygons <- align_columns(green_areas_data_landuse$osm_polygons, green_areas_data_leisure$osm_polygons)
-  green_areas_data$osm_polygons <- rbind(aligned_polygons$df1, aligned_polygons$df2)
-  
-  return(green_areas_data)
+  if(nrow(green_areas_data_landuse$osm_polygons) == 0) {
+    return(green_areas_data_leisure[6])
+  } else if (nrow(green_areas_data_leisure$osm_polygons) == 0) {
+    return(green_areas_data_landuse[6])
+  } else {
+    aligned_polygons <- align_columns(green_areas_data_landuse$osm_polygons, green_areas_data_leisure$osm_polygons)
+    green_areas_data$osm_polygons <- rbind(aligned_polygons$df1, aligned_polygons$df2)
+    return(green_areas_data)
+  }
 }
