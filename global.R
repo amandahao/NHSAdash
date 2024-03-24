@@ -10,7 +10,6 @@ df <- get_education_data(level = "school-districts",
 df$latitude <- jitter(df$latitude)
 df$longitude <- jitter(df$longitude)
 df$zip_location <- formatC(df$zip_location, width=5, format="d", flag="0")
-# row.names(df) <- df$zip_location # use diff than zips bc duplicate zips
 
 # convert urban_centric_locale to string values
 df <- df %>%
@@ -40,6 +39,7 @@ library(zipcodeR)
 
 districts = merge(x = df, y = zip_code_db[,c('zipcode','population','median_household_income')],
                   by.x='zip_location', by.y='zipcode', all.x = TRUE)
+districts <- districts[!is.na(districts$latitude), , drop = FALSE] # remove null values
 
 cleantable <- districts %>%
   dplyr::select(
@@ -60,6 +60,8 @@ cleantable <- districts %>%
     Long = longitude
   )
 
+cleantable <- cleantable[!is.na(cleantable$Lat), , drop = FALSE] # remove null values
+
 #### Head Start locations merged by county ####
 
 aggregated_hs <- cleantable %>%
@@ -71,6 +73,9 @@ aggregated_hs <- cleantable %>%
             SumTotalTeachers = sum(TotalTeachers),
             AllLocale = toString(unique(Locale)),
             .groups = "drop")
+
+#### green space data
+
 
 #### leaflet county map
 

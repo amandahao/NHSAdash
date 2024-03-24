@@ -5,7 +5,10 @@ library(leaflet)
 vars <- c(
   # default choice, add col to df
   "Population" = "population",
-  "Median income" = "median_household_income"
+  "Median income" = "median_household_income",
+  "Number of schools in county" = "number_of_schools",
+  "Total student enrollment" = "enrollment",
+  "Total number of teachers" = "teachers_total_fte"
 )
 
 

@@ -33,27 +33,8 @@ function(input, output, session) {
     colorBy <- input$color
     sizeBy <- input$size
     
-    ### commented out until we have suitable categorical data ###
-    
-    # if (colorBy == "superzip") {
-    #   # Color and palette are treated specially in the "superzip" case, because
-    #   # the values are categorical instead of continuous.
-    #   colorData <- ifelse(zipdata$centile >= (100 - input$threshold), "yes", "no")
-    #   pal <- colorFactor("viridis", colorData)
-    # } else {
-    #   colorData <- zipdata[[colorBy]]
-    #   pal <- colorBin("viridis", colorData, 7, pretty = FALSE)
-    # }
-    # 
-    # if (sizeBy == "superzip") {
-    #   # Radius is treated specially in the "superzip" case.
-    #   radius <- ifelse(zipdata$centile >= (100 - input$threshold), 30000, 3000)
-    # } else {
-    #   radius <- zipdata[[sizeBy]] / max(zipdata[[sizeBy]]) * 30000
-    # }
-    
     colorData <- districtdata[[colorBy]]
-    pal <- colorBin("viridis", colorData, 7, pretty = FALSE)
+    pal <- colorBin("viridis", colorData, 10, pretty = FALSE)
     
     # radius <- districtdata[[sizeBy]] / max(districtdata[[sizeBy]]) * 30000
     radius <- districtdata[[sizeBy]]
@@ -69,15 +50,46 @@ function(input, output, session) {
   # Show a popup at the given location
   showZipcodePopup <- function(zipcode, lat, lng) {
     selectedZip <- districts[districts$zip_location == zipcode,]
+    
+    # handles exception of mult HS centers in one zip same lat/lon
+    multZips = sum(districts$zip_location == zipcode)
+    schoolNames = list()
+    numSchools = 0
+    students = 0
+    teachers = 0
+    if(multZips>1) {
+      for(i in 1:multZips) {
+        numSchools = numSchools + selectedZip$number_of_schools[i]
+        students = students + selectedZip$enrollment[i]
+        teachers = teachers + selectedZip$teachers_total_fte[i]
+        schoolNames<-c(schoolNames,selectedZip$lea_name[i])
+      }
+    }
+    
+    ## debugging
+    # print(multZips)
+    # message("county name:", selectedZip$county_name[1])
+    # message("name:", selectedZip$lea_name, schoolNames)
+    # message("zip:", selectedZip$zip_location[1])
+    # message("Value of income:", selectedZip$median_household_income[1])
+    # message("Value of pop:", selectedZip$population[1])
+    # message("Value of schools:", selectedZip$number_of_schools, numSchools)
+    # message("Value of student:", selectedZip$enrollment, students)
+    # message("Value of teacher:", selectedZip$teachers_total_fte, teachers)
+
     content <- as.character(tagList(
-      tags$h4(selectedZip$lea_name),
+      tags$h4(ifelse(multZips>1, schoolNames, selectedZip$lea_name)),
       tags$strong(HTML(sprintf("%s, %s %s",
-                               selectedZip$county_name, selectedZip$state_location, selectedZip$zip_location
+                               selectedZip$county_name[1], selectedZip$state_location[1], selectedZip$zip_location[1]
       ))), tags$br(),
-      sprintf("Median household income: %s", dollar(selectedZip$median_household_income)), tags$br(),
+      sprintf("Median household income: %s", dollar(selectedZip$median_household_income[1])), tags$br(),
       # sprintf("Percent of adults with BA: %s%%", as.integer(selectedZip$college)), tags$br(),
-      sprintf("Population: %s", selectedZip$population)
+      sprintf("Population: %s", selectedZip$population[1]), tags$br(),
+      sprintf("Number of schools: %s", ifelse(multZips>1, numSchools, selectedZip$number_of_schools)), tags$br(),
+      sprintf("Total student enrollment: %s", ifelse(multZips>1, students, selectedZip$enrollment)), tags$br(),
+      sprintf("Total number of teachers: %s", ifelse(multZips>1, teachers, selectedZip$teachers_total_fte))
     ))
+    
     leafletProxy("map") %>% addPopups(lng, lat, content, layerId = zipcode)
   }
   
