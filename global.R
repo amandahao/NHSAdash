@@ -40,6 +40,7 @@ library(zipcodeR)
 districts = merge(x = df, y = zip_code_db[,c('zipcode','population','median_household_income')],
                   by.x='zip_location', by.y='zipcode', all.x = TRUE)
 districts <- districts[!is.na(districts$latitude), , drop = FALSE] # remove null values
+districts$standard <- 10 # standard sizing
 
 cleantable <- districts %>%
   dplyr::select(
@@ -74,7 +75,7 @@ aggregated_hs <- cleantable %>%
             AllLocale = toString(unique(Locale)),
             .groups = "drop")
 
-#### green space data
+
 
 
 #### leaflet county map

@@ -12,9 +12,9 @@ library(urbnthemes)
 # Leaflet bindings are a bit slow; sampling first 10000
 # set.seed(100)
 # districtdata <- districts[sample.int(nrow(districts), 10000),]
-# By ordering by population, we ensure that the (comparatively rare) HS centers
+# By ordering by population, we ensure that the bigger head start centers
 # will be drawn last and thus be easier to see
-districtdata <- districts[order(districts$population),]
+districtdata <- districts[order(districts$population),] # decreasing=TRUE
 
 function(input, output, session) {
   
@@ -33,16 +33,49 @@ function(input, output, session) {
     colorBy <- input$color
     sizeBy <- input$size
     
-    colorData <- districtdata[[colorBy]]
-    pal <- colorBin("viridis", colorData, 10, pretty = FALSE)
+    # reorders a lot of null values
+    if(colorBy=="number_of_schools") {
+      districtdata <- districts[order(is.na(districts$number_of_schools), decreasing = TRUE), ]
+    } else if(colorBy=="enrollment") {
+      districtdata <- districts[order(is.na(districts$enrollment), decreasing = TRUE), ]
+    } else if(colorBy=="teachers_total_fte") {
+      districtdata <- districts[order(is.na(districts$teachers_total_fte), decreasing = TRUE), ]
+    }
     
+    # colorData <- districtdata[[colorBy]]
+    # pal <- colorBin("viridis", colorData, 7, pretty = FALSE)
+    
+    
+    colorData <- districtdata[[colorBy]]
+    
+    if (colorBy == "default") {
+      fillColor <- "#3B528BFF"
+    } else {
+      pal <- colorBin("viridis", colorData, 7, pretty = FALSE)
+      fillColor <- pal(colorData)
+    }
+    
+    # radius <- districtdata[[sizeBy]]
     # radius <- districtdata[[sizeBy]] / max(districtdata[[sizeBy]]) * 30000
-    radius <- districtdata[[sizeBy]]
+    
+    if(sizeBy=="default") {
+      radius <- 2000
+    } else {
+      radius <- districtdata[[sizeBy]]
+    }
+    
+    # reorders based on 
+    # if(colorBy=="population") {
+    #   districtdata <- districts[order(districts$population),]
+    # } else if(colorBy=="median_household_income") {
+    #   districtdata <- districts[order(districts$median_household_income),]
+    # } else if(colorBy=="median_household_income") {
+    #   districtdata <- districts[order(districts$median_household_income),]
     
     leafletProxy("map", data = districtdata) %>%
       clearShapes() %>%
       addCircles(~longitude, ~latitude, radius=radius, layerId=~zip_location,
-                 stroke=FALSE, fillOpacity=0.4, fillColor=pal(colorData)) %>%
+                 stroke=FALSE, fillOpacity=0.4, fillColor=fillColor) %>%
       addLegend("bottomleft", pal=pal, values=colorData, title=colorBy,
                 layerId="colorLegend")
   })
