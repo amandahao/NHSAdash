@@ -36,14 +36,16 @@ modified_visualizer(dmv_green_data)
 
 ## save to csv - not correct sf format for mod_viz
 
-write.csv(virginia_green_data, file = "va_green_data.csv")
-va_green_data <- read.csv("va_green_data.csv", header = F)
-colnames(va_green_data) <- va_green_data[1, ]
-va_green_data <- va_green_data[-1, ]
-va_green_data <- va_green_data[, -1]
-va_green_data_sf <- st_as_sf(va_green_data, sf_column_name = "geometry")
+library(sf)
 
-modified_visualizer(va_green_data)
+write.csv(dmv_green_data, file = "dmv_green_data.csv", row.names = FALSE)
+test <- read.csv("dmv_green_data.csv", header = F)
+colnames(test) <- test[1, ]
+test <- test[-1, ]
+test <- test[, -1]
+test_sf <- st_as_sf(test, sf_column_name = "geometry")
+
+modified_visualizer(test)
 
 ## extra greenR functions
 

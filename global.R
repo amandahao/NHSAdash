@@ -75,6 +75,30 @@ aggregated_hs <- cleantable %>%
             AllLocale = toString(unique(Locale)),
             .groups = "drop")
 
+#### green space data
+
+# library(greenR)
+# 
+# source("get_green_data.R")
+# 
+# virginia_green_data <- get_green_data("Washington, D.C., United States")$osm_polygons
+# 
+# locations <- read.csv("va_counties.csv", header=F)$V1
+# 
+# for (location in locations) {
+#   green_data <- get_green_data(location)
+#   virginia_green_data <- bind_rows(virginia_green_data, green_data$osm_polygons)
+# }
+# 
+# md_green_data <- get_green_data("Allegany County, Maryland, United States")$osm_polygons
+# md_loc <- read.csv("md_counties.csv", header=F)$V1
+# 
+# for (county in md_loc) {
+#   green_data <- get_green_data(location)
+#   md_green_data <- bind_rows(md_green_data, green_data$osm_polygons)
+# }
+# 
+# dmv_green_data <- bind_rows(virginia_green_data, md_green_data)
 
 
 

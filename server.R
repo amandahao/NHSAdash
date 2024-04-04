@@ -50,6 +50,15 @@ function(input, output, session) {
     
     if (colorBy == "default") {
       fillColor <- "#3B528BFF"
+    } else if (colorBy == "number_of_schools") {
+      pal <- colorBin("viridis", colorData, bins=c(0, 2, 5, 21, 37, 75, 100, 851), pretty = FALSE)
+      fillColor <- pal(colorData)
+    } else if (colorBy == "enrollment") {
+      pal <- colorBin("viridis", colorData, bins=c(0, 249, 677, 2634.46, 12373.51, 22112.57, 31851.62, 435958), pretty = FALSE)
+      fillColor <- pal(colorData)
+    } else if (colorBy == "teachers_total_fte") {
+      pal <- colorBin("viridis", colorData, bins=c(0, 20, 52, 176.2, 780.25, 1384.3, 1988.35, 23348), pretty = FALSE)
+      fillColor <- pal(colorData)
     } else {
       pal <- colorBin("viridis", colorData, 7, pretty = FALSE)
       fillColor <- pal(colorData)
@@ -77,7 +86,15 @@ function(input, output, session) {
       addCircles(~longitude, ~latitude, radius=radius, layerId=~zip_location,
                  stroke=FALSE, fillOpacity=0.4, fillColor=fillColor) %>%
       addLegend("bottomleft", pal=pal, values=colorData, title=colorBy,
-                layerId="colorLegend")
+                layerId="colorLegend") # %>%
+      # addPolygons(
+      #   data = dmv_green_data,
+      #   fillColor = "green",
+      #   fillOpacity = 0.7,
+      #   color = "black",
+      #   weight = 1,
+      #   group = "Green Spaces"
+      # )
   })
   
   # Show a popup at the given location
@@ -124,6 +141,27 @@ function(input, output, session) {
     ))
     
     leafletProxy("map") %>% addPopups(lng, lat, content, layerId = zipcode)
+    
+    
+    # leafletProxy("map") %>%
+    #   addPolygons(
+    #     data = dmv_green_data,
+    #     fillColor = "green",
+    #     fillOpacity = 0.7,
+    #     color = "black",
+    #     weight = 1,
+    #     group = "Green Spaces"
+    #   ) %>%
+    #   addLegend(
+    #     "bottomright",
+    #     colors = "green", # Legend color
+    #     labels = "Green Space", # Legend label
+    #     opacity = 0.7
+    #   ) %>%
+    #   addLayersControl(
+    #     overlayGroups = "Green Spaces", # Group name for the green spaces layer
+    #     options = layersControlOptions(collapsed = TRUE) # Collapsed layer control
+    #   )
   }
   
   # When map is clicked, show a popup with city info
