@@ -12,6 +12,14 @@ vars <- c(
   "Total number of teachers" = "teachers_total_fte"
 )
 
+countyvars <- c(
+  "Population" = "TotalPopulation",
+  "Median income" = "TotalIncome",
+  "Number of schools in county" = "TotalNumSchools",
+  "Total student enrollment" = "SumTotalEnrollment",
+  "Total number of teachers" = "SumTotalTeachers"
+)
+
 
 navbarPage("NHSA Dashboard", id="nav",
            
@@ -56,7 +64,18 @@ navbarPage("NHSA Dashboard", id="nav",
                         tags$head(
                           includeCSS("styles.css"),
                         ),
-                        leafletOutput("countyMap", width="100%", height="100%")
+                        leafletOutput("countyMap", width="100%", height="100%"),
+                        
+                        # Shiny versions prior to 0.11 should use class = "modal" instead.
+                        absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
+                                      draggable = TRUE, top = 60, left = "auto", right = 20, bottom = "auto",
+                                      width = 330, height = "auto",
+                                      
+                                      h2("County explorer"),
+                                      
+                                      selectInput("countyColor", "Color", countyvars),
+                                      conditionalPanel("input.countyColor == 'TotalPopulation'"),
+                        ),
                     )
            ),
            

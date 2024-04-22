@@ -179,25 +179,62 @@ function(input, output, session) {
   
   ## County Map ##############################################
   
-  pal <- colorQuantile("YlOrRd", NULL, n = 9)
+  observe({
+    # colorCountyBy <- input$countyColor
+    # print(colorCountyBy)
 
-  popup_dat <- paste0("<strong>County: </strong>",
-                      merged_data$NAMELSAD,
-                      "<br><strong>Population: </strong>",
-                      merged_data$TotalPopulation)
+    pal <- colorQuantile("YlOrRd", NULL, n = 9)
 
-  output$countyMap <- renderLeaflet({
-    leaflet(data = merged_data) %>%
-      addTiles() %>%
-      setView(lng = -93.85, lat = 37.45, zoom = 4) %>%
-      addPolygons(fillColor = ~pal(TotalPopulation),
-                  fillOpacity = 0.8,
-                  color = "#BDBDC3",
-                  weight = 1,
-                  popup = popup_dat)%>%
-      addLegend("bottomleft", pal=pal, values=merged_data$TotalPopulation, title="population",
-                layerId="colorLegend")
+    popup_dat <- paste0("<strong>County: </strong>",
+                        merged_data$NAMELSAD,
+                        "<br><strong>Population: </strong>",
+                        merged_data$TotalPopulation)
+
+    output$countyMap <- renderLeaflet({
+      leaflet(data = merged_data) %>%
+        addTiles() %>%
+        setView(lng = -93.85, lat = 37.45, zoom = 4) %>%
+        addPolygons(fillColor = ~pal(TotalPopulation),
+                    fillOpacity = 0.8,
+                    color = "#BDBDC3",
+                    weight = 1,
+                    popup = popup_dat)%>%
+        addLegend("bottomleft", pal=pal, values=merged_data$TotalPopulation, title="population",
+                  layerId="colorLegend")
+    })
   })
+  
+  ##### ATTEMPT TO ADD COLOR SWITCHING TO COUNTY MAP
+  
+  # observe({
+  #   colorCountyBy <- input$countyColor
+  # 
+  #   # pal <- colorQuantile("YlOrRd", NULL, n = 9)
+  # 
+  #   colorData <- districtdata[[colorCountyBy]]
+  #   pal <- colorBin("viridis", colorData, bins=c(0, 2, 5, 21, 37, 75, 100, 851), pretty = FALSE)
+  #   fillColor <- pal(colorData)
+  # 
+  #   popup_dat <- paste0("<strong>County: </strong>",
+  #                       merged_data$NAMELSAD,
+  #                       "<br><strong>Population: </strong>",
+  #                       merged_data$TotalPopulation)
+  # 
+  #   output$countyMap <- renderLeaflet({
+  #     leaflet(data = merged_data) %>%
+  #       addTiles() %>%
+  #       setView(lng = -93.85, lat = 37.45, zoom = 4) %>%
+  #       addPolygons(fillColor = fillColor,
+  #                   fillOpacity = 0.8,
+  #                   color = "#BDBDC3",
+  #                   weight = 1,
+  #                   popup = popup_dat)%>%
+  #       addLegend("bottomleft", pal=pal, values=merged_data$colorCountyBy, title="population",
+  #                 layerId="colorLegend")
+  #   })
+  # })
+  
+  
   
   # using leafletproxy for county map - not working?
   
